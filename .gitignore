@@ -19,7 +19,8 @@
 .env.production.local
 .env
 
-!/uploads/
+uploads/*.jpg
+uploads/*.jpeg
 
 npm-debug.log*
 yarn-debug.log*
