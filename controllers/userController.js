@@ -1,9 +1,9 @@
 const UserModel = require('../models/UserModel');
 const bcrypt = require('bcrypt');
-const saltRounds = 10;
+const saltRounds = Number(process.env.JWT_SAULTROUNDS);
 const salt = bcrypt.genSaltSync(saltRounds);
 const jwt = require('jsonwebtoken');
-const jwtseacret = 'asdsdfwersf';
+const jwtseacret = process.env.JWT_SECRET;
 
 module.exports = {
   login: async (req, res) => {
@@ -50,9 +50,9 @@ module.exports = {
         password: await bcrypt.hash(password, salt),
       });
 
-      res.json(user);
+      res.status(201).json(user);
     } catch (e) {
-      res.status(422).json(e);
+      res.status(422).json({ error: 'Error while creating user' });
     }
   },
 };
