@@ -18,6 +18,9 @@ mongoose.connect(process.env.MONGO_URL).then(() => {
   console.log('mongodb is ready');
 });
 
+app.use('/', (req, res) => {
+  res.send('hotelx backend');
+});
 app.use('/uploads', express.static(__dirname + '/uploads'));
 app.post('/img-uploaded-by-link', uploadByUrl);
 app.post('/img-delete-by-name', deleteImage);
