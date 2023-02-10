@@ -1,4 +1,6 @@
+const { image } = require('image-downloader');
 const LocationsModel = require('../models/LocationsModel');
+const { deleteBulkImages } = require('./imageController');
 module.exports = {
   addLocation: async (req, res) => {
     const {
@@ -11,6 +13,7 @@ module.exports = {
       checkin,
       checkOut,
       maxGuests,
+      perPrice,
     } = req.body;
     try {
       const location = await LocationsModel.create({
@@ -23,6 +26,7 @@ module.exports = {
         checkin,
         checkOut,
         maxGuests,
+        perPrice,
       });
       if (location) {
         res.json(location);
@@ -48,6 +52,18 @@ module.exports = {
       res.status(500).json({ message: 'something went wrong' });
     }
   },
+  allLocations: async (req, res) => {
+    try {
+      const allLocations = await LocationsModel.find();
+      if (allLocations) {
+        res.status(200).json({ allLocations });
+      } else {
+        res.status(404).json({ message: 'You dont have Accomadations' });
+      }
+    } catch (err) {
+      res.status(500).json({ message: 'something went wrong' });
+    }
+  },
   getLocationByID: async (req, res) => {
     const id = req.params.id;
     try {
@@ -59,6 +75,7 @@ module.exports = {
   },
   editLocationByID: async (req, res) => {
     const id = req.params.id;
+
     const {
       name,
       address,
@@ -68,7 +85,13 @@ module.exports = {
       checkin,
       checkOut,
       maxGuests,
+      perPrice,
+      deletedImages,
     } = req.body;
+
+    if (deletedImages.length) {
+      deleteBulkImages(deletedImages);
+    }
     try {
       const existingLocation = await LocationsModel.findById(id);
       if (existingLocation) {
@@ -79,6 +102,7 @@ module.exports = {
         existingLocation.maxGuests = maxGuests || existingLocation.maxGuests;
         existingLocation.images = images || existingLocation.images;
         existingLocation.perks = perks || existingLocation.perks;
+        existingLocation.perPrice = perPrice || existingLocation.perPrice;
         existingLocation.description =
           description || existingLocation.description;
         const updatedLocation = await existingLocation.save();
@@ -90,5 +114,23 @@ module.exports = {
       res.status(500).json({ message: 'something went wrong', err: err });
     }
   },
-  deleteLocationByID: async (req, res) => {},
+  deleteLocationByID: async (req, res) => {
+    const { id } = req.body;
+
+    try {
+      const existingLoacation = await LocationsModel.findById(id);
+      if (existingLoacation) {
+        const images = existingLoacation.images;
+        if (images.length) {
+          await deleteBulkImages(images);
+        }
+        await LocationsModel.findByIdAndRemove(id);
+        res.status(200).json(id);
+      } else {
+        res.status(404).json('canot find the location');
+      }
+    } catch (err) {
+      res.status(500).json({ message: 'something went wrong', err: err });
+    }
+  },
 };

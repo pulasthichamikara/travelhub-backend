@@ -25,7 +25,6 @@ module.exports = {
             if (err) {
               throw err;
             } else {
-              //res.cookie('token', token).json('login sucessfull');
               res.json({
                 token: token,
                 name: userDocument.name,
@@ -35,10 +34,10 @@ module.exports = {
           }
         );
       } else {
-        res.status(404).json('password not matching');
+        res.status(401).json('password not matching');
       }
     } else {
-      res.status(404).json('canot find any record for this email');
+      res.status(401).json('canot find any record for this email');
     }
   },
 

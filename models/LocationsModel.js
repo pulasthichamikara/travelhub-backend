@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
 const { Schema } = mongoose;
-const { protect } = require('../middleware/authMiddleware');
+
 const LocationSchema = new Schema({
   owner: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
   name: { type: String, requird: true },
@@ -11,6 +11,7 @@ const LocationSchema = new Schema({
   checkin: String,
   checkOut: String,
   maxGuests: Number,
+  perPrice: Number,
 });
 
 const LocationsModel = mongoose.model('Location', LocationSchema);
