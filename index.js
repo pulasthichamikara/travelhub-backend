@@ -20,7 +20,6 @@ mongoose.connect(process.env.MONGO_URL).then(() => {
 
 app.use('/uploads', express.static(__dirname + '/uploads'));
 app.post('/img-uploaded-by-link', uploadByUrl);
-app.post('/img-delete-by-name', deleteImage);
 
 app.use('/user', userRouter);
 app.use('/location', locationRouter);
