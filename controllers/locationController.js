@@ -14,6 +14,11 @@ module.exports = {
       checkOut,
       maxGuests,
       perPrice,
+      rooms,
+      bed,
+      bath,
+
+      country,
     } = req.body;
     try {
       const location = await LocationsModel.create({
@@ -27,6 +32,11 @@ module.exports = {
         checkOut,
         maxGuests,
         perPrice,
+        rooms,
+        bed,
+        bath,
+
+        country,
       });
       if (location) {
         res.json(location);
@@ -87,6 +97,11 @@ module.exports = {
       maxGuests,
       perPrice,
       deletedImages,
+      rooms,
+      bed,
+      bath,
+
+      country,
     } = req.body;
 
     if (deletedImages.length) {
@@ -103,6 +118,11 @@ module.exports = {
         existingLocation.images = images || existingLocation.images;
         existingLocation.perks = perks || existingLocation.perks;
         existingLocation.perPrice = perPrice || existingLocation.perPrice;
+        existingLocation.rooms = rooms || existingLocation.rooms;
+        existingLocation.bed = bed || existingLocation.bed;
+        existingLocation.bath = bath || existingLocation.bath;
+
+        existingLocation.country = country || existingLocation.country;
         existingLocation.description =
           description || existingLocation.description;
         const updatedLocation = await existingLocation.save();
