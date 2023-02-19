@@ -13,20 +13,21 @@ module.exports = {
       const userDocument = await UserModel.findOne({ email });
 
       if (!userDocument) {
-        return res.status(401).json('Cannot find any record for this email');
+        return res
+          .status(401)
+          .json({ error: 'Cannot find any record for this email' });
       }
 
       const passwordOk = await bcrypt.compare(password, userDocument.password);
 
       if (!passwordOk) {
-        return res.status(400).json('Password not matching');
+        return res.status(400).json({ error: 'Password not matching' });
       }
 
-      jwt.sign({ id: userDocument._id }, jwtSecret, {}, (err, token) => {
+      jwt.sign({ id: userDocument._id }, jwtseacret, {}, (err, token) => {
         if (err) {
-          throw err;
+          res.status(500).json({ error: err });
         }
-
         res.json({
           token: token,
           name: userDocument.name,
@@ -34,8 +35,8 @@ module.exports = {
         });
       });
     } catch (err) {
-      console.error(err);
-      res.status(500).json('Something went wrong');
+      console.log(err);
+      res.status(500).json({ error: err });
     }
   },
   register: async (req, res) => {
@@ -43,7 +44,7 @@ module.exports = {
     try {
       const userDocument = await UserModel.findOne({ email });
       if (userDocument) {
-        res.status(422).json({ error: 'Error while creating user' });
+        res.status(422).json({ error: 'this email is already used' });
       } else {
         const user = await UserModel.create({
           name,
@@ -54,7 +55,7 @@ module.exports = {
         res.status(201).json({ userId: user._id });
       }
     } catch (e) {
-      res.status(422).json({ error: 'Error while creating user' });
+      res.status(500).json({ error: 'Something went wrong' });
     }
   },
 };
