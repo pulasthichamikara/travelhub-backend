@@ -64,14 +64,34 @@ module.exports = {
   },
   allLocations: async (req, res) => {
     try {
-      const allLocations = await LocationsModel.find();
-      if (allLocations) {
-        res.status(200).json({ allLocations });
-      } else {
-        res.status(404).json({ message: 'You dont have Accomadations' });
+      const queryParams = req.query;
+      const searchParams = {};
+      const perPage = queryParams.hasOwnProperty('perPage')
+        ? Number(queryParams.perPage)
+        : 10;
+      const page = Number(queryParams.page) || 1;
+
+      // Sanitize and validate input parameters
+      if (queryParams.country) {
+        searchParams.country = queryParams.country.trim();
       }
-    } catch (err) {
-      res.status(500).json({ message: 'something went wrong' });
+
+      if (queryParams.guestCount) {
+        const guestCount = parseInt(queryParams.guestCount);
+        if (!isNaN(guestCount)) {
+          searchParams.maxGuests = { $gt: guestCount - 1 };
+        }
+      }
+      console.log(searchParams);
+      const allLocations = await LocationsModel.find(searchParams)
+        .limit(perPage)
+        .skip((page - 1) * perPage);
+      const allLocationsCount = await LocationsModel.count(searchParams);
+      const pages = Math.ceil(allLocationsCount / perPage);
+      return res.status(200).json({ allLocations, pages });
+    } catch (error) {
+      console.error(error);
+      return res.status(500).json({ message: 'Something went wrong' });
     }
   },
   getLocationByID: async (req, res) => {
